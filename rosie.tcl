@@ -11,6 +11,8 @@ proc coin {} { expr { int(rand()+0.5) } }
 
 
 proc ACGT { data } {
+    set data [regsub {[^ACGT]} $data {}]
+
     set A [string map { G {} C {} T {} } $data]
     set C [string map { A {} G {} T {} } $data]
     set G [string map { A {} C {} T {} } $data]
