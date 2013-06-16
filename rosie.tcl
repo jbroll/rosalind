@@ -190,6 +190,8 @@ proc lcs-len { A B } {
     return [lindex $K 1 end]
 }
 
+# http://web.expasy.org/docs/userman.html
+#
 proc swiss-prot { data } {
     set date -1
     set dates { integrated sequence entry } 
