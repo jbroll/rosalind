@@ -17,6 +17,6 @@ set data [read [open ~/Downloads/rosalind_gbk.txt]]
 
 lassign $data genus fr to
 
-set result [entrez esearch nucleotide [subst -nocommands { $genus[Organism] AND ("$fr"[PDAT] : "$to"[PDAT])}]]
+set result [entrez::esearch nucleotide [subst -nocommands { $genus[Organism] AND ("$fr"[PDAT] : "$to"[PDAT])}]]
 puts $result
 

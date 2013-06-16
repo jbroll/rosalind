@@ -234,6 +234,8 @@ proc swiss-prot { data } {
     set reply
 }
 
+
+interp alias {} fasta2list {} fasta
 proc fasta { data } {
 
     set state 0
@@ -259,6 +261,15 @@ proc fasta { data } {
 	}
     }
     if { [string length $prot] } { lappend reply $prot }
+
+    set reply
+}
+
+proc list2fasta { list } {
+    foreach { name seq } $list {
+	append reply > $name \n
+	append reply [join [string chunk $seq] \n] \n
+    }
 
     set reply
 }
