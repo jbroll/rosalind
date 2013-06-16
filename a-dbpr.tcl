@@ -4,6 +4,9 @@
 source func.tcl
 source unix.tcl
 source http.tcl
+source dict.tcl
+
+source rosie.tcl
 
 set data H3SRW3
 set data [string trim [read [open ~/Downloads/rosalind_dbpr.txt]]]

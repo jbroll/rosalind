@@ -1,4 +1,5 @@
 
+proc I { x }   { set x }
 proc K { x y } { set x }
 
 proc +   { x y } { expr $x + $y }
@@ -28,7 +29,7 @@ proc map { args } {
     }]
 }
 
-proc pick {func list} {
+proc pick { func list } {
     set ret [list]
     foreach item $list {
 	if {[eval $func [list $item]]} {
