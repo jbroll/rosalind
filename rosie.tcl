@@ -243,13 +243,13 @@ proc fasta { data } {
     set state 0
     set prot {}
     foreach line [split $data \n] {
-	if { [string trim $line] eq {} } {
+	if { [string trim $line] eq {} } {				; Blank line is end of protien
 	    if { [string length $prot] } { lappend reply $prot }
 	    set prot {}
 	    continue
 	}
 
-	if { [string index $line 0] eq ">" } {
+	if { [string index $line 0] eq ">" } {				; > is start of entry
 	    if { [string length $prot] } { lappend reply $prot }
 	    set prot {}
 
@@ -274,6 +274,61 @@ proc list2fasta { list } {
     }
 
     set reply
+}
+
+proc fastq { data } {
+
+    set state 0
+    set prot {}
+    set qual {}
+
+    foreach line [split $data \n] {
+	set line [string trim $line]
+
+	switch $state {
+	    0 { 
+		if { [string index $line 0] eq "@" } {					; # @ is start of entry
+		    set tagg [string range $line 1 end]
+
+		    set state 1
+		}
+	    }
+	    1 { 
+		if { [string index $line 0] eq "+" } {					; # + is start of qual
+		    set state 2
+		    continue
+		}
+		append prot $line 
+	    }
+	    2 {
+		if { $qual ne {} && ( [string index $line 0] eq "@" || [string index $line 0] eq "" ) } {	; # @ is start of entry
+		    lappend reply $tagg $prot $qual
+
+		    set tagg [string range $line 1 end]
+		    set prot {}
+		    set qual {}
+
+		    set state [expr { [string index $line 0] eq "@" }]
+
+		    continue
+		}
+		append qual $line 
+	    }
+	}
+    }
+    if { $state == 2 } {
+	lappend reply $tagg $prot $qual
+    }
+
+    set reply
+}
+
+proc fastq2quality { fastq } {
+    # !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+
+    binary scan $fastq c* quality
+
+    map q $quality { expr { $q-33 } }
 }
 
 

@@ -1,5 +1,7 @@
 
 namespace eval entrez {
+    set elimiter 0
+
     set equery [list tool "John's rosalind tcl tools" email john@rkroll.com]
     set eroot http://eutils.ncbi.nlm.nih.gov/entrez/eutils
 
@@ -19,12 +21,21 @@ namespace eval entrez {
 	}
     }
 
+    proc elimiter {} {
+	variable elimiter
+
+	after [expr { max(0, $elimiter - [clock milliseconds]) }]
+
+	set elimiter [expr { [clock milliseconds] + 333 }]
+    }
+
     proc esearch { db term } {
         variable equery
 	variable eroot
-
 	variable entrez {}
-	variable edone 0
+	variable edone   0
+
+	elimiter
 
 	tax::parse entrez::esearch-xml-parse [http $eroot/esearch.fcgi [dict merge $equery [list db $db term $term]]]
 
@@ -34,6 +45,8 @@ namespace eval entrez {
     proc efetch { db id { retmode FULL } { rettype FASTA } } {
 	variable equery
 	variable eroot
+
+	elimiter
 
 	http $eroot/efetch.fcgi [dict merge $equery [list db $db id [join $id ,] retmode $retmode rettype $rettype]]
     }
