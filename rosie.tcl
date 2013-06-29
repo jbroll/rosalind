@@ -21,6 +21,17 @@ proc ACGT { data } {
     list [string length $A] [string length $C] [string length $G] [string length $T]
 }
 
+proc ACGU { data } {
+    set data [regsub {[^ACGU]} $data {}]
+
+    set A [string map { G {} C {} U {} } $data]
+    set C [string map { A {} G {} U {} } $data]
+    set G [string map { A {} C {} U {} } $data]
+    set U [string map { A {} G {} C {} } $data]
+
+    list [string length $A] [string length $C] [string length $G] [string length $U]
+}
+
 proc gc { gc n } {
     for { set i 0 } { $i < $n } { incr i } {
 	append data [expr { rand() < $gc ? (rand() < .5 ? "G" : "C") : (rand() < .5 ? "A" : "T") }]
@@ -243,13 +254,15 @@ proc fasta { data } {
     set state 0
     set prot {}
     foreach line [split $data \n] {
-	if { [string trim $line] eq {} } {				; Blank line is end of protien
+        set line [string trim $line]
+
+	if { [string trim $line] eq {} } {				; # Blank line is end of protien
 	    if { [string length $prot] } { lappend reply $prot }
 	    set prot {}
 	    continue
 	}
 
-	if { [string index $line 0] eq ">" } {				; > is start of entry
+	if { [string index $line 0] eq ">" } {				; # > is start of entry
 	    if { [string length $prot] } { lappend reply $prot }
 	    set prot {}
 

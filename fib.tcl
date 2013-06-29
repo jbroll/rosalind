@@ -10,3 +10,10 @@ proc fib { n { x  1 } } {
 }
 memo fib
 
+proc fact { n } {
+    if { $n == 1 } { return 1 }
+
+    fact [expr $n-1]
+}
+memo fact
+
