@@ -1,8 +1,6 @@
 #!/usr/bin/env tclkit8.6
 #
 
-source tax.tcl
-
 source func.tcl
 source unix.tcl
 source http.tcl

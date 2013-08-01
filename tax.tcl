@@ -1,6 +1,6 @@
  namespace eval tax {}
 
-# ::tax::__cleanprops -- Clean parsed XML properties
+ # ::tax::__cleanprops -- Clean parsed XML properties
  #
  #        This command cleans parsed XML properties by removing the
  #        trailing slash and replacing equals by spaces so as to produce
@@ -45,19 +45,18 @@
  # Side Effects:
  #        None.
  proc ::tax::parse {cmd xml {start docstart}} {
-     regsub -all \{ $xml {\&ob;} xml
-     regsub -all \} $xml {\&cb;} xml
+     set xml [string map { "{" "&ob;" "}" "&cb;" } $xml]
+
      set exp {<(/?)([^\s/>]+)\s*([^>]*)>}
-     set sub "\}\n$cmd {\\2} \[expr \{{\\1} ne \"\"\}\] \[regexp \{/$\} {\\3}\] \
+     set sub "\}\n{*}$cmd {\\2} \[expr \{{\\1} ne \"\"\}\] \[regexp \{/$\} {\\3}\] \
               \[::tax::__cleanprops \{\\3\}\] \{"
      regsub -all $exp $xml $sub xml
      eval "$cmd {$start} 0 0 {} \{$xml\}"
      eval "$cmd {$start} 1 0 {} {}"
  }
 
-proc ::tax::xml2list { xml } {
-    regsub -all \{ $xml {\&ob;} xml
-    regsub -all \} $xml {\&cb;} xml
+ proc ::tax::xml2list { xml } {
+    set xml [string map { "{" "&ob;" "}" "&cb;" } $xml]
 
     set xexp  {<\?([^\s/>]+)\s*([^>]*)\?>}
     set oexp  {<([^\s/>]+)\s*([^>]*)\??>}
@@ -70,4 +69,4 @@ proc ::tax::xml2list { xml } {
     regsub -all $cexp $xml \}                                           xml
 
     return "[subst $xml]\}"
-}
+ }

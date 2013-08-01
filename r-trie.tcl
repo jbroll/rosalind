@@ -10,7 +10,7 @@ set data {
     ATC
     GAT
 }
-set data [read [open ~/Downloads/rosalind_trie.txt]]
+#set data [read [open ~/Downloads/rosalind_trie.txt]]
 
 foreach word $data {
     trie add t $word
