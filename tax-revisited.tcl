@@ -10,7 +10,6 @@
  #
  # Namespace "tax" stands for "Tiny API for XML"
  #
- 
  namespace eval tax {
      # Initialise the global state
      variable TAX
@@ -30,11 +29,11 @@
  }
 
 
-
  # Core of the TAX parser, XML parser in 10 lines, magic!
+ #
  proc tax::parse {cmd xml {start docstart}} {
-     regsub -all \{ $xml {\&ob;} xml
-     regsub -all \} $xml {\&cb;} xml
+     set xml [string map {{ &ob; } \%cb;} $xml]
+
      set exp {<(/?)([^\s/>]+)\s*([^/>]*)(/?)>}
      set sub "\}\n$cmd {\\2} \[expr \{{\\1} ne \"\"\}\] \[expr \{{\\4} ne \"\"\}\] \
              \[regsub -all -- \{\\s+|(\\s*=\\s*)\} {\\3} \" \"\] \{"
@@ -75,6 +74,7 @@
  # Calling this will return a command that complies to the original TAX
  # callback format and allows the command passed as an argument to
  # comply to the new argument list.
+ #
  proc tax::new {cmd} {
      variable TAX
  
@@ -86,39 +86,22 @@
  
      return "::tax::__callbacker $id $cmd"
  }
- 
- 
- # Example procedure that complies to the new callback argument list.
- # This procedure simply dumps back the original XML file almost as is.
- proc tax::output { tag type props bdy tree } {
-     # Get rid of XML header information, just duplicate it
-     if { [string index $tag 0] eq "?" } {
-        puts "<$tag $props>"
-        return
-     }
-     # The first tag is a false "docstart" tag, ignore it.
-     if { [llength $tree] == 0 } {
-        return
-     }
- 
-     if { $type == "C" } {
-        puts "</$tag>"
-     } else {
-        puts -nonewline "<$tag"
-        if { [llength $props] >= 0 } {
-            array set properties $props
-            foreach p [array names properties] {
-                puts -nonewline " $p=\"$properties($p)\""
-            }
-        }
-        if { $type == "O" } {
-            if { [string trim $bdy] eq "" } {
-                puts ">"
-            } else {
-                puts -nonewline ">$bdy"
-            }
-        } else {
-            puts " />"
-        }
-     }
+
+
+
+
+ proc ::tax::xml2list { xml } {
+    set xml [string map { "{" "&ob;" "}" "&cb;" } $xml]
+
+    set xexp  {<\?([^\s/>]+)\s*([^>]*)\?>}
+    set oexp  {<([^\s/>]+)\s*([^>]*)\??>}
+    set cexp {</([^\s/>]+)\s*([^>]*)>}
+
+    regsub -all {\[}  $xml \\\[ xml
+
+    regsub      $xexp $xml { \1 { [::tax::__cleanprops {\2}] } \{}      xml
+    regsub -all $oexp $xml { \1 { [::tax::__cleanprops {\2}] } \{}      xml
+    regsub -all $cexp $xml \}                                           xml
+
+    return "[subst $xml]\}"
  }

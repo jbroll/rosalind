@@ -3,6 +3,7 @@
 
 
 source func.tcl
+source dict.tcl
 source rosie.tcl
 
 set data {
@@ -25,11 +26,13 @@ set data {
     node14 node15 6 5
     node14 node16 10 1
 }
-#set data [read [open ~/Downloads/rosalind_lrep.txt]]
+set data [read [open ~/Downloads/rosalind_lrep.txt]]
 
 set nodes [lassign $data str n]
 
 #puts "$str $n"
+
+set X {}
 
 foreach { parent child start len } $nodes {
     set here $start
@@ -37,38 +40,39 @@ foreach { parent child start len } $nodes {
     incr len  -1
     #puts "$parent $child $start $len [string range $str $here $start+$len]"
 
-    dict lappend X($parent) children $child
-    dict lappend X($child)  content   $here $here+$len
+    dict lappend2 X $parent children $child
+    dict set      X $child  content  [list $here $here+$len]
 }
 
-proc dict? { args } {
-    set x {}
 
-    try { set x [dict {*}$args] } on error message {}
+proc follow { X name str { pre {} } { indent {} } } {
 
-    return $x
-}
+    try { set pre $pre[string range $str {*}[dict get? $X $name content]] } on error message { }
 
-proc follow { array name str { indent {} } } {
-    upvar $array X
+    #puts "$indent $name : [string length $pre] [llength [dict get? $X $name children]]"
+    #puts "[llength [dict get? $X $name children]]"
 
-    set pre {}
-    
-    try { set pre [string range $str {*}[dict? get $X($name) content]] } on error message { }
-
-    puts "$indent $name : $pre"
-
-    foreach child [dict? get $X($name) children] {
-	follow X $child $str "$indent  "
+    set sum 0
+    foreach child [dict get? $X $name children] {
+	incr sum [follow $X $child $str $pre "$indent  "]
     }
-	
+    if { !$sum } { set sum 1 }
+
+
+    if { $::n <= $sum && [string length $pre] > $::max } {
+	set ::reply $pre
+	set ::max [string length $pre]
+    }
+
+    return $sum
 }
 
 
-puts $str
+#puts $str
+set max    0
+set reply {}
 
-follow X node1 $str
+follow $X node1 $str
 
-
-
+puts $reply
 

@@ -10,5 +10,16 @@ proc ::tcl::dict::lappend2 {dict args} {
 	dict set d {*}[lrange $args 0 end-1] $list
     }
 } 
+
 namespace ensemble configure dict -map [dict merge [namespace ensemble configure dict -map] {lappend2 ::tcl::dict::lappend2}] 
 
+
+proc ::tcl::dict::get? {args} {
+
+    try { 		 ::set x [dict get {*}$args]
+    } on error message { ::set x {} }
+
+    return $x
+}
+
+namespace ensemble configure dict -map [dict merge [namespace ensemble configure dict -map] {get? ::tcl::dict::get?}] 

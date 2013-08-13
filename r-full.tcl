@@ -47,7 +47,13 @@ set data {
 set ions [lassign $data P] 
 
 puts [expr { ([llength $ions]-2)/2.0 }]
-puts $ions
+
+set diff [map ion $ions { expr $P-$ion }]
+
+puts [lsort -r $ions]
+puts [lsort -r $diff]
+
+exit
 
 set xions [map { x y } [join [prod $ions $ions list]] { 
     if { abs(($x+$y)-$P) > 0.001 } { continue } 
