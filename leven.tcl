@@ -11,9 +11,7 @@ proc leven { s t } {
 										 # for an empty s.
     set v1 [lrepeat [expr { [string length $t]+1 }] 0] 	      			; # zero current row.
 
-	    puts "v0 : $v0 	v1 : $v1"
-
-    foreach i [iota 0 [string length $s]] {
+    for { set i 0 } { $i < [string length $s] } { incr i } { 
         # calculate v1 (current row distances) from the previous row v0
  
         lset v1 0 [expr { $i + 1 }] 			      ; # first element of v1 is A[i+1][0]
@@ -21,12 +19,8 @@ proc leven { s t } {
  
 	for { set j 0 } { $j < [string length $t] } { incr j } { 		# use formula to fill in the rest of the row
 
-	puts "$i $j"
+	    set cost [expr { ([string index $s $i] eq [string index $t $j]) ? 0 : 1 }]
 
-	    set cost [expr { ([lindex $s $i] eq [lindex $t $j]) ? 0 : 1 }]
-
-	    puts "v0 : $v0 	v1 : $v1"
-	    puts "lset v1 $j+1 \[expr { min([lindex $v1 $j] + 1, [lindex $v1 $j+1] + 1, [lindex $v0 $j] + $cost) }]"
 	    lset v1 $j+1 [expr { min([lindex $v1 $j] + 1, [lindex $v0 $j+1] + 1, [lindex $v0 $j] + $cost) }]
 	}
 

@@ -7,15 +7,16 @@ source leven.tcl
 source func.tcl
 
 set data {
-    PLEASANTLY
-    MEANLY
+>Rosalind_39
+PLEASANTLY
+>Rosalind_11
+MEANLY
 }
-set data {
-    1234
-    1
-}
-#set data [read [open ~/Downloads/rosalind_edit.txt]]
+set data [read [open ~/Downloads/rosalind_edit.txt]]
+#set data [read [open ~/Downloads/rosalind_edit_4_dataset.txt]]
 
-lassign $data A B
+lassign [fasta $data] 1 A 2 B
+puts $A
+puts $B
 
 puts [leven $A $B]
