@@ -44,7 +44,26 @@ set data {
 }
 #set data [read [open ~/Downloads/rosalind_full.txt]]
 
-set ions [lassign $data P] 
+set ions [lsort -r [lassign $data P]]
+set nion [llength $ions]
+
+# After sorting the smaller half must be paired in order
+# with the larger half
+#
+set pairs [map 1 [lrange $ions 0 [expr $nion/2-1]] 2 [lreverse [lrange $ions [expr $nion/2] end]] { list $2 $1 }]
+
+set prev [lindex [lindex $pairs 0] 0]
+puts $prev
+set diffs [map pair [lrange $pairs 1 end] { lassign $pair 1 2; K [expr { $prev - $1 }] [set prev $1] } ]
+
+set prots [map p $diffs { lookup $p .001 $::ISOMassList }]
+
+puts $pairs
+puts $diffs
+puts $prots
+exit
+
+
 
 puts [expr { ([llength $ions]-2)/2.0 }]
 
